@@ -29,12 +29,7 @@ namespace XchyUIDemo
 
         public override void OnLoad()
         {
-            var page = new XPage();
-            XTask.Run(() =>
-            {
-                SvgResources.Load();
-                RenderImp.Invalidate();
-            });
+            var page = new XPage();            
             page.RootView = ContentView(() =>
             {
                 Column(() =>
@@ -92,7 +87,7 @@ namespace XchyUIDemo
                  .Size(WRAP)
                  .Space(10);
             }).View;
-            skiaNavigation.Navigation.Open(page);
+            OpenPage(page);
         }
     }
 }

@@ -51,6 +51,7 @@ namespace XchyUI.Components.utils
             var top = hoverRect.Top - space - view.Height;
             var right = hoverRect.Right + space + view.Width;
             var bottom = hoverRect.Bottom + space + view.Height;
+            space = enablePopover ? 4.AsPx() : 10.AsPx();
             if (bottom < height)
             {
                 marginY = hoverRect.Bottom + space;

@@ -232,8 +232,8 @@ namespace XchyUI.Components
                                 .HoverCursor(XCursorType.Hand)
                                 .Click(() =>
                                 {
-                                    currentDateTimeState.Value = day;
                                     selectedDateTimeState.Value = day;
+                                    currentDateTimeState.Value = day;
                                     if (isCurrentMonth)
                                     {
                                         onSelected?.Invoke(day);

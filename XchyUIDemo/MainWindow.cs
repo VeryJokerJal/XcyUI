@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using XchyUI.animation;
 using XchyUI.Components;
 using XchyUI.GLFW.window;
 using XchyUI.models;
@@ -61,9 +62,21 @@ namespace XchyUIDemo
                            }, needLayout: true); //改变文本需要重新布局，默认为false
 
 
+                        var visibleState = StateValueOf(true);
+                        var animateValue = AnimateFloatOf(visibleState, animate =>
+                        {
+                            animate.Duration = 2000; // 执行时间
+                            animate.SetValues(1, 2f, 1); // 关键帧
+                            animate.Times = int.MaxValue; // 执行次数
+                            animate.SetInterpolators(XAnimationInterpolator.ExponentialDecelerate, XAnimationInterpolator.SineDecelerate); // 插值器
+                        });
                         Icon(SvgRes.Loading)
-                            .Color(xTheme.Colors.PrimaryText)
-                            .Size(32).CircleProgress();
+                            .Color(xTheme.Colors.Primary)
+                            .Size(32)
+                            .Binding(animateValue, (builder, value) =>
+                            {
+                                builder.Scale(value).Rotate(value * 360).Alpha(value);
+                            });
                         // 点击交互
                         Text("点击增加计数")
                            .PrimaryButton()
@@ -97,19 +110,18 @@ namespace XchyUIDemo
                     Column(() =>
                     {
                         var valueState = StateValueOf(0.5f);
-                        Box(valueState, value =>
+                        Column(valueState, value =>
                         {
                             Text(() =>
                             {
                                 Span("当前值：").H3();
                                 Span("" + (int)(value * 100)).H3().Color(XColors.Red);
                             });
-                        }).Size(WRAP);
-                        Space(10);
-                        Silder(valueState.Value, value =>
-                        {
-                            valueState.Value = value;
-                        });
+                            Silder(valueState.Value, value =>
+                            {
+                                valueState.Value = value;
+                            });
+                        }).Size(WRAP).Space(10);
 
                         Column(valueState, value =>
                         {

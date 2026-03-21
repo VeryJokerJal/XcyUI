@@ -25,7 +25,8 @@ namespace XchyUIDemo
 
         public override void OnLoad()
         {
-            XThemeManager.Theme.DefaultFontName = "Microsoft YaHei";
+            // 如果是windows虚拟机linux加上这行
+            // XThemeManager.Theme.DefaultFontName = "Microsoft YaHei";
             var page = new XPage();            
             page.RootView = ContentView(() =>
             {

@@ -511,7 +511,7 @@ namespace XchyUI.Components
             Box(() =>
             {
                 var valueState = StateValueOf(value);
-                var isDragValue = false;
+                bool? isDragValue = null;
                 Space(trackSize).Width(FILL).Radius(trackSize / 2).Background(xTheme.Colors.BaseBorder)
                 .HoverCursor(XCursorType.Hand)
                 .Click((builder, info) =>
@@ -547,7 +547,7 @@ namespace XchyUI.Components
                 .Margin(left: (int)(trackWidth - thumbSize / 2))
                 .Binding(valueState, (builder, progress) =>
                 {
-                    if (!isDragValue)
+                    if (isDragValue!=null && !isDragValue.Value)
                     {
                         var left = (width - thumbSize) * progress;
                         builder.View.X = builder.View.Parent.X + (int)left.AsPx();

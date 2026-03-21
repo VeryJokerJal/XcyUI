@@ -6,6 +6,7 @@ using XchyUI.models;
 using XchyUI.navigation;
 using XchyUI.theme;
 using XchyUI.utils;
+using XchyUI.views;
 using XchyUI.widgets;
 using XchyUI.widgets.extensions;
 using static XchyUI.Components.Compoments;
@@ -24,6 +25,7 @@ namespace XchyUIDemo
 
         public override void OnLoad()
         {
+            XThemeManager.Theme.DefaultFontName = "Microsoft YaHei";
             var page = new XPage();            
             page.RootView = ContentView(() =>
             {

@@ -6,12 +6,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<HotReloadEnabled>true</HotReloadEnabled>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<PublishAot>true</PublishAot>
+	<TrimMode>full</TrimMode>
+	<DebugType>none</DebugType>
+	<Optimize>true</Optimize>
+	<InvariantGlobalization>true</InvariantGlobalization>
+	<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <PublishNativeAssetsForSelfExtract>true</PublishNativeAssetsForSelfExtract>
+	<RuntimeIdentifiers>win-x64;linux-x64;linux-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Silk.NET.GLFW" Version="2.22.0" />
     <PackageReference Include="SkiaSharp" Version="3.119.1" />
     <PackageReference Include="Svg.Skia" Version="3.2.1" />
+	<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.1" />
   </ItemGroup>
 
   <ItemGroup>

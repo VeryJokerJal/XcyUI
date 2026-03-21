@@ -247,13 +247,16 @@ namespace XchyUI.Components
                     Color = XColors.Black,
                     Blur = 2
                 };
+                var panelWidth = 300;
+                var panelHeight = 200;
+                var pointerSize = 8;
                 Row(() =>
                 {
                     // 渐变面板
                     Box(() =>
                     {
                         Space()
-                        .Size(300, 200)
+                        .Size(panelWidth, panelHeight)
                         .Click((builder, info) =>
                         {
                             var rect = builder.View.RenderRect;
@@ -283,27 +286,19 @@ namespace XchyUI.Components
                         });
 
                         // 选点
-                        Space(8).Circle()
+                        Space(pointerSize)
+                        .Circle()
                         .Binding(panelRect, (builder, rect) =>
                         {
                             if (rect.Width != 0)
                             {
                                 var dragRect = rect;
-                                var radius = builder.View.Height / 2;
-                                dragRect.Translation(-radius, -radius);
-                                builder.Drag(XDragType.All, dragRangRect: dragRect, onDrag: (builder, info) =>
-                                {
-                                    ColorUtils.PointToSV(info.X - rect.Left, info.Y - rect.Top, rect.Width, rect.Height,
-               out s, out v);
-                                    var selectColor = ColorUtils.HsvToColor(h, s, v);
-                                    var alpha = selectColorState.Value.Alpha;
-                                    selectColorState.Value = selectColor.Copy(alpha);
-                                });
                                 var p = ColorUtils.SVToPoint(s, v, rect);
-                                var marginX = p.X - rect.X - radius;
-                                var marginY = p.Y - rect.Y - radius;
+                                var radius = pointerSize.AsPx() / 2;
+                                var marginX = p.X - rect.X;
+                                var marginY = p.Y - rect.Y;
                                 builder.Margin(marginX.AsDp(), marginY.AsDp());
-                                builder.View.Location = new XPoint(p.X - radius, p.Y - radius);
+                                builder.View.Location = new XPoint(p.X, p.Y);
                                 builder.View.Invalidate();
                             }
                         })
@@ -311,20 +306,36 @@ namespace XchyUI.Components
                         {
                             onSelected?.Invoke(color);
                         })
+                        .Drag(XDragType.All, (builder, info) =>
+                        {
+                            var rect = panelRect.Value;
+                            var center = builder.View.RenderRect.Center;
+                            ColorUtils.PointToSV(center.X - rect.Left, center.Y - rect.Top, rect.Width, rect.Height,
+               out s, out v);
+                            var selectColor = ColorUtils.HsvToColor(h, s, v);
+                            var alpha = selectColorState.Value.Alpha;
+                            selectColorState.Value = selectColor.Copy(alpha);
+                        })
                         .Border(XColors.White, 2)
                         .Background(XColors.Gray)
                         .Shadow(shadow)
                         .Alignment(XAlignment.LeftTop);
 
-                    }).Size(300, 200).ClipContent(false);
+                    })
+                    .Size(panelWidth + pointerSize, panelHeight + pointerSize)
+                    .ClipContent(false);
 
                     Space(10);
 
                     // 彩色条
+                    var hueWidth = 18;
+                    var hueHeight = 200;
+                    var hueBarWidth = 20;
+                    var hueBarHeight = 6;
                     Box(() =>
                     {
                         Space()
-                        .Size(18, 200)
+                        .Size(hueWidth, hueHeight)
                         .Click((builder, info) =>
                         {
                             h = ColorUtils.YToHue(info.Y - builder.View.Y, builder.View.Height);
@@ -349,40 +360,44 @@ namespace XchyUI.Components
                             });
                         });
                         // hue 条
-                        Space().Size(22, 6)
+                        Space().Size(hueBarWidth, hueBarHeight)
                         .Background(XColors.White)
                         .Alignment(XAlignment.TopCenter)
                         .Binding(hueRect, (builder, rect) =>
                         {
                             if (rect.Width != 0)
                             {
-                                var dragRect = rect;
-                                var dist = builder.View.Height / 2;
-                                dragRect.Translation(0, -dist);
-                                builder.Drag(XDragType.Vertical, dragRangRect: dragRect, onDrag: (builder, info) =>
-                                {
-                                    h = ColorUtils.YToHue(info.Y - rect.Y, rect.Height);
-                                    var alpha = selectColorState.Value.Alpha;
-                                    selectColorState.Value = ColorUtils.HsvToColor(h, s, v).Copy(alpha);
-                                });
                                 float hy = ColorUtils.HueToY(h, rect.Height);
-                                int y = (int)(hy + rect.Y - dist);
+                                int y = (int)(hy + rect.Y);
                                 builder.Margin(top: (y - rect.Y).AsDp());
                                 builder.View.Y = y;
                                 builder.View.Invalidate();
                             }
                         })
+                        .Drag(XDragType.Vertical, (builder, info) =>
+                        {
+                            var rect = hueRect.Value;
+                            var y = builder.View.RenderRect.Center.Y;
+                            h = ColorUtils.YToHue(y - rect.Y, rect.Height);
+                            var alpha = selectColorState.Value.Alpha;
+                            selectColorState.Value = ColorUtils.HsvToColor(h, s, v).Copy(alpha);
+                        })
                         .Radius(2).DefaultBorder().Shadow(shadow);
-                    }).Size(18, 200).ClipContent(false);
+                    })
+                    .Size(hueBarWidth, hueHeight + hueBarHeight)
+                    .ClipContent(false);
+
                 }).ClipContent(false);
 
                 Space(10);
 
                 // 透明度条
+                var alphaBarWidth = 6;
                 Box(() =>
                 {
                     Space()
                     .Size(FILL, 18)
+                    .Margin(horizontal: alphaBarWidth / 2)
                     .Click((builder, info) =>
                     {
                         var left = info.X - builder.View.X;
@@ -420,33 +435,34 @@ namespace XchyUI.Components
                         RenderImp.DrawRect(rect, style);
                     });
 
-                    Space().Size(6, 22)
+                    Space().Size(alphaBarWidth, 22)
                         .Background(XColors.White)
                         .Alignment(XAlignment.LeftCenter)
                         .Binding(alphaRect, (builder, rect) =>
                         {
                             if (rect.Width != 0)
                             {
-                                var dragRect = rect;
-                                var dist = builder.View.Width / 2;
-                                dragRect.Translation(-dist, 0);
-                                builder.Drag(XDragType.Horizontal, dragRangRect: dragRect, onDrag: (builder, info) =>
-                                {
-                                    var left = info.X - rect.X;
-                                    left = Math.Min(left, rect.Width);
-                                    left = Math.Max(0, left);
-                                    var alpha = ((float)left / rect.Width) * 255;
-                                    selectColorState.Value = selectColorState.Value.Copy((byte)alpha);
-                                });
                                 float hx = (selectColorState.Value.Alpha / 255f) * rect.Width;
-                                int x = (int)(hx + rect.X - dist);
+                                int x = (int)(hx + rect.X);
                                 builder.Margin(left: (x - rect.X).AsDp());
                                 builder.View.X = x;
                                 builder.View.Invalidate();
                             }
                         })
+                        .Drag(XDragType.Horizontal, (builder, info) =>
+                        {
+                            var rect = alphaRect.Value;
+                            var center = builder.View.RenderRect.Center;
+                            var left = center.X - rect.X;
+                            left = Math.Min(left, rect.Width);
+                            left = Math.Max(0, left);
+                            var alpha = ((float)left / rect.Width) * 255;
+                            selectColorState.Value = selectColorState.Value.Copy((byte)alpha);
+                        })
                         .Radius(2).DefaultBorder().Shadow(shadow);
-                }).Size(FILL, 18).ClipContent(false);
+                })
+                .Size(FILL, 18)
+                .ClipContent(false);
 
                 Space(10);
                 Row(() =>
@@ -497,15 +513,7 @@ namespace XchyUI.Components
             }).Size(WRAP).Padding(6).ClipPadding(false);
         }
 
-        /// <summary>
-        /// slider滑道
-        /// </summary>
-        /// <param name="value">进度值0-1</param>
-        /// <param name="onValueChanged">值变化时候回调</param>
-        /// <param name="width">组件宽度</param>
-        /// <param name="trackSize">滑道高度</param>
-        /// <param name="thumbSize">滑块大小</param>
-        public static void Silder(float value, XFunction<float>? onValueChanged = null, int width = 500, int trackSize = 10, int thumbSize = 28)
+        public static void Silder(float value, XFunction<float>? onSelected = null, int width = 500, int trackSize = 10, int thumbSize = 28)
         {
             var trackWidth = value * (width - thumbSize);
             Box(() =>
@@ -523,7 +531,8 @@ namespace XchyUI.Components
                     value = Math.Min(1, value);
                     isDragValue = false;
                     valueState.Value = value;
-                    onValueChanged?.Invoke(valueState.Value);
+
+                    onSelected?.Invoke(valueState.Value);
                 }, defaultEffect: false);
 
                 Space(trackSize)
@@ -536,18 +545,16 @@ namespace XchyUI.Components
                 .Radius(trackSize / 2)
                 .Background(xTheme.Colors.Primary);
 
-                // 悬浮动画
                 var visibleState = StateValueOf(false);
                 var animateValue = AnimateFloatOf(visibleState);
                 var isMaxScale = StateValueOf(false);
 
-                // 滑块手柄
                 Space(thumbSize).Background(xTheme.Colors.White)
                 .Border(xTheme.Colors.Primary, 2)
                 .Margin(left: (int)(trackWidth - thumbSize / 2))
                 .Binding(valueState, (builder, progress) =>
                 {
-                    if (isDragValue!=null && !isDragValue.Value)
+                    if (isDragValue != null && !isDragValue.Value)
                     {
                         var left = (width - thumbSize) * progress;
                         builder.View.X = builder.View.Parent.X + (int)left.AsPx();
@@ -561,7 +568,7 @@ namespace XchyUI.Components
                     value = (float)trackWidth / (width - thumbSize);
                     isDragValue = true;
                     valueState.Value = value;
-                    onValueChanged?.Invoke(valueState.Value);
+                    onSelected?.Invoke(valueState.Value);
                 })
                 .ToggleHover(isHover =>
                 {
@@ -586,6 +593,7 @@ namespace XchyUI.Components
                     }
                 })
                 .Circle();
+
             })
             .Size(width, WRAP)
             .ContentAlignment(XAlignment.LeftCenter)

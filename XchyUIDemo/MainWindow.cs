@@ -123,8 +123,8 @@ namespace XchyUIDemo
                             Silder(valueState.Value, value =>
                             {
                                 valueState.Value = value;
-                            });
-                        }).Size(WRAP).Space(10);
+                            }).Width(FILL).Margin(horizontal:10);
+                        }).Size(FILL, WRAP).Space(10);
 
                         Column(valueState, value =>
                         {
@@ -133,7 +133,7 @@ namespace XchyUIDemo
                                 Silder(valueState.Value, value =>
                                 {
                                     valueState.Value = value;
-                                });
+                                }).Width(FILL).Margin(horizontal: 10);
                             }
                         }).Weight(1).Space(10).Scrollable();
                     }).Margin(20).Card();

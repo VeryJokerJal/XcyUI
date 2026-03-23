@@ -513,35 +513,49 @@ namespace XchyUI.Components
             }).Size(WRAP).Padding(6).ClipPadding(false);
         }
 
-        public static void Silder(float value, XFunction<float>? onSelected = null, int width = 500, int trackSize = 10, int thumbSize = 28)
+        public static XViewBuilder Silder(float value, XFunction<float>? onSelected = null, int trackSize = 10, int thumbSize = 28)
         {
-            var trackWidth = value * (width - thumbSize);
-            Box(() =>
+            return Box(() =>
             {
                 var valueState = StateValueOf(value);
-                bool? isDragValue = null;
+                var widthState = StateValueOf(0, true);
+                var isDragValueState = StateValueOf(false);
                 Space(trackSize).Width(FILL).Radius(trackSize / 2).Background(xTheme.Colors.BaseBorder)
                 .HoverCursor(XCursorType.Hand)
+                .MeasureStart(n =>
+                {
+                    valueState.Value = value;
+                    widthState.Value = n.View.Parent.Width;
+                })
                 .Click((builder, info) =>
                 {
-                    var left = info.X - builder.View.Parent.X;
+                    var left = info.X - builder.View.Parent.X - thumbSize.AsPx() / 2;
                     var trackWidth = left.AsDp();
+                    var width = widthState.Value.AsDp();
                     value = (float)trackWidth / (width - thumbSize);
                     value = Math.Max(0, value);
                     value = Math.Min(1, value);
-                    isDragValue = false;
+                    isDragValueState.Value = false;
                     valueState.Value = value;
-
                     onSelected?.Invoke(valueState.Value);
                 }, defaultEffect: false);
-
                 Space(trackSize)
+                .Binding(widthState, (builder, pwidth) =>
+                {
+                    if (widthState.Value > 0)
+                    {
+                        var trackWidth = (pwidth - thumbSize.AsPx()) * valueState.Value;
+                        builder.Width((int)trackWidth.AsDp());
+                    }
+                })
                 .Binding(valueState, (builder, value) =>
                 {
+                    if (widthState.Value == 0) return;
+                    var width = widthState.Value;
+                    var thumbSizePx = thumbSize.AsPx();
                     var trackWidth = (width - thumbSize) * value;
-                    builder.Width((int)trackWidth);
+                    builder.Width((int)trackWidth.AsDp());
                 }, needLayout: true)
-                .Width((int)trackWidth)
                 .Radius(trackSize / 2)
                 .Background(xTheme.Colors.Primary);
 
@@ -549,24 +563,37 @@ namespace XchyUI.Components
                 var animateValue = AnimateFloatOf(visibleState);
                 var isMaxScale = StateValueOf(false);
 
-                Space(thumbSize).Background(xTheme.Colors.White)
+                Space(thumbSize)
+                .Background(xTheme.Colors.White)
                 .Border(xTheme.Colors.Primary, 2)
-                .Margin(left: (int)(trackWidth - thumbSize / 2))
+                .Binding(widthState, (builder, pwidth) =>
+                {
+                    if (widthState.Value > 0)
+                    {
+                        var width = widthState.Value;
+                        var thumbSizePx = thumbSize.AsPx();
+                        var trackWidth = valueState.Value * (width - thumbSizePx);
+                        var left = (int)(trackWidth - thumbSizePx / 2);
+                        builder.Margin(left: left.AsDp());
+                    }
+                })
                 .Binding(valueState, (builder, progress) =>
                 {
-                    if (isDragValue != null && !isDragValue.Value)
+                    if (widthState.Value > 0 && !isDragValueState.Value)
                     {
+                        var width = widthState.Value.AsDp();
                         var left = (width - thumbSize) * progress;
                         builder.View.X = builder.View.Parent.X + (int)left.AsPx();
                     }
                 })
                 .Drag(XDragType.Horizontal, (builder, info) =>
                 {
+                    var width = widthState.Value.AsDp();
                     var left = builder.View.X - builder.View.Parent.X;
                     var trackWidth = left.AsDp();
                     builder.Margin(left: trackWidth - thumbSize / 2);
-                    value = (float)trackWidth / (width - thumbSize);
-                    isDragValue = true;
+                    var value = (float)trackWidth / (width - thumbSize);
+                    isDragValueState.Value = true;
                     valueState.Value = value;
                     onSelected?.Invoke(valueState.Value);
                 })
@@ -593,13 +620,11 @@ namespace XchyUI.Components
                     }
                 })
                 .Circle();
-
             })
-            .Size(width, WRAP)
+            .Size(500, WRAP)
             .ContentAlignment(XAlignment.LeftCenter)
             .Padding(horizontal: thumbSize / 2)
             .ClipContent(false);
-
         }
     }
 }

@@ -120,20 +120,20 @@ namespace XchyUIDemo
                                 Span("当前值：").H3();
                                 Span("" + (int)(value * 100)).H3().Color(XColors.Red);
                             });
-                            Silder(valueState.Value, value =>
-                            {
-                                valueState.Value = value;
-                            }).Width(FILL).Margin(horizontal:10);
+                            //Silder(valueState.Value, value =>
+                            //{
+                            //    valueState.Value = value;
+                            //}).Width(FILL).Margin(horizontal:10);
                         }).Size(FILL, WRAP).Space(10);
 
                         Column(valueState, value =>
                         {
                             for (int i = 0; i < 100; i++)
                             {
-                                Silder(valueState.Value, value =>
-                                {
-                                    valueState.Value = value;
-                                }).Width(FILL).Margin(horizontal: 10);
+                                //Silder(valueState.Value, value =>
+                                //{
+                                //    valueState.Value = value;
+                                //}).Width(FILL).Margin(horizontal: 10);
                             }
                         }).Weight(1).Space(10).Scrollable();
                     }).Margin(20).Card();

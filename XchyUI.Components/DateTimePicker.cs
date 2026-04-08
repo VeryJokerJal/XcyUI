@@ -28,7 +28,7 @@ namespace XchyUI.Components
                     .Margin(vertical: 10).Hand()
                     .Click(() =>
                     {
-                        if (typeState.Value == 1)
+                        if(typeState.Value == 1)
                         {
                             startYearState.Value -= 10;
                         }
@@ -36,7 +36,7 @@ namespace XchyUI.Components
                         {
                             currentDateTimeState.Value = currentDateTimeState.Value.AddYears(-1);
                         }
-
+                       
                     }, defaultEffect: false);
 
                     // 选择天的时候
@@ -61,7 +61,7 @@ namespace XchyUI.Components
                             }
                             builder.TextValue(year);
 
-                        }, needParentLayout: true)
+                        }, needParentLayout:true)
                         .Click(() =>
                         {
                             var year = currentDateTimeState.Value.Year;
@@ -112,7 +112,7 @@ namespace XchyUI.Components
             void WeekBar()
             {
                 string[] weeks = { "日", "一", "二", "三", "四", "五", "六" };
-                Space(10);
+                Spacer(10);
                 Row(() =>
                 {
                     for (int i = 0; i < weeks.Length; i++)
@@ -135,7 +135,7 @@ namespace XchyUI.Components
 
             void SelectYearPanel()
             {
-                Space(20);
+                Spacer(20);
                 Flow(startYearState, startYear =>
                 {
                     for (int i = 0; i < 10; i++)
@@ -144,7 +144,7 @@ namespace XchyUI.Components
                         Text($"{year}")
                         .Height(cellHeight)
                         .TextAlignment(XAlignment.Center)
-                        .Radius(cellHeight / 2)
+                        .Radius(cellHeight/2)
                         .Hand()
                         .Click(() =>
                         {
@@ -152,7 +152,7 @@ namespace XchyUI.Components
                             currentDateTimeState.Value = currentDateTimeState.Value.AddYears(num);
                             typeState.Value = 2;
                         }, defaultEffect: false)
-                        .Also(builder =>
+                        .Also(builder=>
                         {
                             SetHoverStyle(builder, year == currentDateTimeState.Value.Year);
                         });
@@ -162,7 +162,7 @@ namespace XchyUI.Components
 
             void SelectMonthPanel()
             {
-                Space(20);
+                Spacer(20);
                 Flow(currentDateTimeState, dateTime =>
                 {
                     for (int i = 0; i < 12; i++)
@@ -181,7 +181,7 @@ namespace XchyUI.Components
                         }, defaultEffect: false)
                         .Also(builder =>
                         {
-                            SetHoverStyle(builder, currentDateTimeState.Value.Year == DateTime.Now.Year && mouth == currentDateTimeState.Value.Month);
+                            SetHoverStyle(builder, currentDateTimeState.Value.Year == DateTime.Now.Year &&  mouth == currentDateTimeState.Value.Month);
                         });
                     }
                 }).Size(FILL, WRAP).Cells(4).Space(20);
@@ -263,13 +263,13 @@ namespace XchyUI.Components
             }
             return Column(typeState, type =>
             {
-                Space(10);
+                Spacer(10);
                 DateTitleBar();
 
                 if (type == 0)
                 {
                     WeekBar();
-                    Space(1).Width(FILL).Background(xTheme.Colors.BaseBorder);
+                    Spacer(1).Width(FILL).Background(xTheme.Colors.BaseBorder);
                     SelectDayPanel();
                 }
                 else if (type == 1)

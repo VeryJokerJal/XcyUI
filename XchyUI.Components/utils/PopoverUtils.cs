@@ -7,87 +7,40 @@ namespace XchyUI.Components.utils
 {
     public class PopoverUtils
     {
-        internal static ArrowDirection GetArrowDirection(XViewBuilder builder, XRect hoverRect)
+        internal static ArrowDirection GetArrowDirection(XRect rect, XRect sourceRect, int width, int height, bool isAlignLeft = true, int space = 20)
         {
-            var view = builder.View;
-            var rect = view.RenderRect;
-            var height = view.RootView().Height;
-            var width = view.RootView().Width;
-            var arrowSize = 12.AsPx();
-            var space = 10.AsPx();
-            var direction = ArrowDirection.Top;
-            var left = hoverRect.Left - space - view.Width;
-            var top = hoverRect.Top - space - view.Height;
-            var right = hoverRect.Right + space + view.Width;
-            var bottom = hoverRect.Bottom + space + view.Height;
-            if (bottom < height)
+            space = space.AsPx();
+            var marginX = isAlignLeft ? sourceRect.X : sourceRect.X - (rect.Width - sourceRect.Width) / 2;
+            var marginY = sourceRect.Bottom + space;
+            var destRect = new XRect(marginX, marginY, rect.Width, rect.Height);
+            var arrowDirection = ArrowDirection.Top;
+            if (destRect.Bottom > height)
             {
-                direction = ArrowDirection.Top;
+                destRect.Y = sourceRect.Y - space - rect.Height;
+                arrowDirection = ArrowDirection.Bottom;
             }
-            else if (top > 0)
+            if (destRect.Y < 0)
             {
-                direction = ArrowDirection.Bottom;
+                destRect.Y = sourceRect.Center.Y - rect.Height / 2;
+                destRect.X = sourceRect.Right + space;
+                arrowDirection = ArrowDirection.Left;                
             }
-            else if (right < width)
+            if (destRect.Right > width)
             {
-                direction = ArrowDirection.Left;
+                destRect.X = sourceRect.X - space - rect.Width;
+                destRect.Y = sourceRect.Center.Y - rect.Height / 2;
+                arrowDirection = ArrowDirection.Right;
             }
-            else if (left > 0)
+            if (destRect.X < 0)
             {
-                direction = ArrowDirection.Right;
+                destRect.X = marginX;
+                destRect.Y = marginY;
+                arrowDirection = ArrowDirection.Top;
             }
-            return direction;
+            return arrowDirection;
         }
-        internal static XPoint GetPopoverLocation(XViewBuilder builder, XRect hoverRect, bool enablePopover = true)
-        {
-            var view = builder.View;
-            var padding = builder.View.LayoutParams.Padding;
-            var space = enablePopover ? 4.AsPx() : 10.AsPx();
-            var marginX = hoverRect.Left - (int)padding.Left;
-            var marginY = hoverRect.Bottom + space;
-            var height = view.RootView().Height;
-            var width = view.RootView().Width;
-            var left = hoverRect.Left - space - view.Width;
-            var top = hoverRect.Top - space - view.Height;
-            var right = hoverRect.Right + space + view.Width;
-            var bottom = hoverRect.Bottom + space + view.Height;
-            space = enablePopover ? 4.AsPx() : 10.AsPx();
-            if (bottom < height)
-            {
-                marginY = hoverRect.Bottom + space;
-                if (marginX < 0 && marginX + view.Width < width)
-                {
-                    marginX = hoverRect.Left - (int)padding.Left;
-                }
-                else if (marginX > 0 && marginX + view.Width > width)
-                {
-                    marginX = hoverRect.Left - view.Width + hoverRect.Width + (int)padding.Right;
-                }
-            }
-            else if (top > 0)
-            {
-                marginY = hoverRect.Top - space - view.Height;
-                if (marginX < 0 && marginX + view.Width < width)
-                {
-                    marginX = hoverRect.Left - (int)padding.Left;
-                }
-                else if (marginX > 0 && marginX + view.Width > width)
-                {
-                    marginX = hoverRect.Left - view.Width + hoverRect.Width + (int)padding.Right;
-                }
-            }
-            else if (right < width)
-            {
-                marginX = hoverRect.Right + space;
-                marginY = hoverRect.Center.Y - view.Height / 2;
-            }
-            else if (left > 0)
-            {
-                marginX = hoverRect.X - space - view.Width;
-                marginY = hoverRect.Center.Y - view.Height / 2;
-            }
-            return new XPoint((int)(marginX), (int)(marginY));
-        }
+        
+        
         public static void DrawRoundedArrowBubble(
             XRect rect,
             XStyle style,
@@ -107,7 +60,6 @@ namespace XchyUI.Components.utils
             int cx = hoverRect.Center.X; // 中心X
             int cy = hoverRect.Center.Y; // 中心Y
             // 计算方向
-
             RenderImp.DrawPath(rect, style, isCache, () =>
             {
                 RenderImp.MoveTo(l + radius, t);
@@ -145,6 +97,50 @@ namespace XchyUI.Components.utils
                 RenderImp.LineTo(l, t + radius);
                 RenderImp.ArcTo(l + radius, t, radius);
             });
+        }
+
+        internal static XPoint GetLocation(XRect rect, XRect sourceRect, int width, int height, bool isAlignLeft = true, int space = 20)
+        {
+            space = space.AsPx();
+            var marginX = isAlignLeft ? sourceRect.X : sourceRect.X - (rect.Width - sourceRect.Width) / 2;
+            var marginY = sourceRect.Bottom + space;
+            var destRect = new XRect(marginX, marginY, rect.Width, rect.Height);
+            if (destRect.Bottom > height)
+            {
+                destRect.Y = sourceRect.Y - space - rect.Height;
+            }
+            if (destRect.Y < 0)
+            {
+                destRect.Y = sourceRect.Center.Y - rect.Height / 2;
+                destRect.X = sourceRect.Right + space;
+                if (destRect.Y < 0)
+                {
+                    destRect.Y = 0;
+                }
+                else if (destRect.Bottom > height)
+                {
+                    destRect.Y -= destRect.Bottom - height;
+                }
+            }
+            if (destRect.Right > width)
+            {
+                destRect.X = sourceRect.X - space - rect.Width;
+                destRect.Y = sourceRect.Center.Y - rect.Height / 2;
+                if (destRect.Y < 0)
+                {
+                    destRect.Y = 0;
+                }
+                else if (destRect.Bottom > height)
+                {
+                    destRect.Y -= destRect.Bottom - height;
+                }
+            }
+            if (destRect.X < 0)
+            {
+                destRect.X = marginX;
+                destRect.Y = marginY;
+            }
+            return destRect.Point;
         }
 
         public enum ArrowDirection

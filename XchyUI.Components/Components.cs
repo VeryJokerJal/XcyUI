@@ -1,13 +1,15 @@
-﻿using XchyUI.expansions;
-using XchyUI.models;
+﻿using System.Drawing;
+using System.Runtime.CompilerServices;
 using XchyUI.Components.utils;
+using XchyUI.expansions;
+using XchyUI.models;
 using XchyUI.theme;
 using XchyUI.utils;
 using XchyUI.views;
 using XchyUI.widgets;
 using XchyUI.widgets.extensions;
-using static XchyUI.models.XFunctions;
 using static XchyUI.Components.utils.PopoverUtils;
+using static XchyUI.models.XFunctions;
 using static XchyUI.widgets.XWidget;
 
 namespace XchyUI.Components
@@ -21,15 +23,15 @@ namespace XchyUI.Components
         /// <param name="onSelected">选中的回调</param>
         /// <param name="disable">是否禁用</param>
         /// <returns></returns>
-        public static XViewBuilder Switch(bool isSelected, XFunction<bool>? onSelected = null, bool disable = false)
+        public static XViewBuilder Switch(bool isSelected, XFunction<bool>? onSelected = null, bool disable = false, [CallerLineNumber]int key =0)
         {
-            var selectedState = StateValueOf(isSelected);
+            var selectedState = StateValueOf(isSelected, key: key);
             var visibleState = StateValueOf(false);
             var animiateValue = AnimateFloatOf(visibleState);
             var dist = 32;
             return Box(() =>
             {
-                Space(30)
+                Spacer(30)
                 .Circle()
                 .Binding(animiateValue, (builder, value) =>
                 {
@@ -38,14 +40,14 @@ namespace XchyUI.Components
                     {
                         marginX = selectedState.Value ? value * dist : (1 - value) * dist;
                     }
-                    builder.Margin(left: (int)marginX);
-                }, needParentLayout: true)
+                    builder.Margin(left: (int)marginX).View.Parent.StartLayout();
+                })
                 .Binding(selectedState, (builder, isSelected) =>
                 {
                     var backgroundColor = isSelected ? xTheme.Light.BlankFill : xTheme.Light.BlankFill;
                     builder.Background(backgroundColor);
                 }).Shadow(xTheme.Shadows.MinCard);
-            })
+            }, key: key)
             .ContentAlignment(XAlignment.LeftCenter)
             .Binding(selectedState, (builder, isSelected) =>
             {
@@ -86,12 +88,12 @@ namespace XchyUI.Components
             fontSize = fontSize ?? xTheme.Sizes.Body;
             fontColor = fontColor ?? xTheme.Colors.RegularText;
             tint = tint ?? fontColor;
-            var fontColorState = StateValueOf(XColor.Empty);
-            fontColorState.Value = fontColor.Value;
-            var tintState = StateValueOf(XColor.Empty);
-            tintState.Value = tint.Value;
             XFunction function = () =>
             {
+                var fontColorState = StateValueOf(XColor.Empty);
+                fontColorState.Value = fontColor.Value;
+                var tintState = StateValueOf(XColor.Empty);
+                tintState.Value = tint.Value;
                 if (loadingState != null)
                 {
                     Box(loadingState, loading =>
@@ -111,7 +113,7 @@ namespace XchyUI.Components
                 {
                     Icon(resId).Size(iconSize.Value).Color(tintState.Value);
                 }
-                Text(text).TextBody().FontSize(fontSize.Value).FontColor(fontColorState.Value).FontWeight(xTheme.Weights.Button);
+                Text(text).FontSize(fontSize.Value).FontColor(fontColorState.Value).FontWeight(xTheme.Weights.Button);
             };
             var builder = isVerticel ? Column(function).Size(WRAP) : Row(function);
             return builder
@@ -122,7 +124,7 @@ namespace XchyUI.Components
                 .VerticalAlignment(XVerticalAlignment.Center)
                 .Space(10)
                 .ClipContent(false)
-                .Padding(horizontal: xTheme.Sizes.Space20 - 10, vertical: xTheme.Sizes.Space12);
+                .Padding(horizontal: xTheme.Sizes.Space20, vertical: xTheme.Sizes.Space12);
         }
 
         /// <summary>
@@ -134,7 +136,7 @@ namespace XchyUI.Components
         /// <returns></returns>
         public static XViewBuilder ColorLoading(XColor color, int size, int borderSize)
         {
-            return Space(size).Circle()
+            return Spacer(size).Circle()
                .EnableCache(true)
                .ClipContent(false)
                .OnDraw(builder =>
@@ -164,7 +166,7 @@ namespace XchyUI.Components
         /// <returns></returns>
         public static XViewBuilder ColorCircleProgress(XColor color, int size, int borderSize, XState<float> progress)
         {
-            return Space(size)
+            return Spacer(size)
                 .Circle()
                 .EnableCache(true)
                 .Circle()
@@ -183,21 +185,35 @@ namespace XchyUI.Components
                 });
         }
 
-        public static XViewBuilder PopoverCard(XFunction content, XState<XRect> rectState, bool enablePopover = true)
+        public static XViewBuilder PopoverCard(XFunction content, XState<XRect> rectState, bool enablePopover = true, bool isAlignLeft = false, bool isSameWidth = false)
         {
-            var builder = Box(content).Size(WRAP)
-                .MiniCard()
-                .Padding(enablePopover ? xTheme.Sizes.Space16 : 0)
+            var padding = 16.AsPx();
+            var builder = Box(content)
+                .Size(WRAP)
+                .Width(isSameWidth?(enablePopover?((rectState.Value.Width+ padding * 2).AsDp()) : rectState.Value.Width.AsDp()) : WRAP)
+                .Card()
+                .Padding(enablePopover?16: 0)
                 .Radius(xTheme.Radius.Low)
                 .Alignment(XAlignment.LeftTop)
-                .Binding(rectState, (builder, hoverRect) =>
-                {
-                    var point = GetPopoverLocation(builder, rectState.Value, enablePopover);
-                    builder.Margin(left: point.X.AsDp(), top: point.Y.AsDp());
-                })
                 .MeasureEnd(builder =>
                 {
-                    var point = GetPopoverLocation(builder, rectState.Value, enablePopover);
+                    var width = builder.View.RootView().Width;
+                    var height = builder.View.RootView().Height;
+                    var rect = builder.View.ContentRect;
+                    var sourceRect = rectState.Value;
+                    var point = GetLocation(rect, sourceRect, width, height, isAlignLeft, enablePopover ? 5 : 10);
+                    if (enablePopover)
+                    {
+                        var direction = GetArrowDirection(rect, sourceRect, width, height, isAlignLeft, 10);
+                        if (direction == ArrowDirection.Top) point.X -= padding;
+                        if (direction == ArrowDirection.Bottom)
+                        {
+                            point.X -= padding;
+                            point.Y -= padding * 2;
+                        }
+                        if (direction == ArrowDirection.Right) point.X -=padding * 2;
+                    }
+                    builder.View.Location = point;
                     builder.Margin(left: point.X.AsDp(), top: point.Y.AsDp());
                 });
             if (enablePopover)
@@ -207,12 +223,14 @@ namespace XchyUI.Components
                     .ClipContent(false)
                     .OnDraw(builder =>
                     {
-                        var hoverRect = rectState.Value;
+                        var sourceRect = rectState.Value;
                         var view = builder.View;
                         var rect = view.ContentRect;
-                        var arrowSize = 12.AsPx();
-                        var direction = GetArrowDirection(builder, hoverRect);
-                        DrawRoundedArrowBubble(rect, view.Style, view.IsCache, hoverRect, (int)view.Style.Radius.All, arrowSize, direction);
+                        var width = view.RootView().Width;
+                        var height = view.RootView().Height;
+                        var arrowSize = 10.AsPx();
+                        var direction = GetArrowDirection(rect, sourceRect, width, height, isAlignLeft, 10);
+                        DrawRoundedArrowBubble(rect, view.Style, view.IsCache, sourceRect, (int)view.Style.Radius.All, arrowSize, direction);
                     }, isOver: false);
             }
             return builder;
@@ -255,7 +273,7 @@ namespace XchyUI.Components
                     // 渐变面板
                     Box(() =>
                     {
-                        Space()
+                        Spacer()
                         .Size(panelWidth, panelHeight)
                         .Click((builder, info) =>
                         {
@@ -286,7 +304,7 @@ namespace XchyUI.Components
                         });
 
                         // 选点
-                        Space(pointerSize)
+                        Spacer(pointerSize)
                         .Circle()
                         .Binding(panelRect, (builder, rect) =>
                         {
@@ -325,7 +343,7 @@ namespace XchyUI.Components
                     .Size(panelWidth + pointerSize, panelHeight + pointerSize)
                     .ClipContent(false);
 
-                    Space(10);
+                    Spacer(10);
 
                     // 彩色条
                     var hueWidth = 18;
@@ -334,7 +352,7 @@ namespace XchyUI.Components
                     var hueBarHeight = 6;
                     Box(() =>
                     {
-                        Space()
+                        Spacer()
                         .Size(hueWidth, hueHeight)
                         .Click((builder, info) =>
                         {
@@ -360,7 +378,7 @@ namespace XchyUI.Components
                             });
                         });
                         // hue 条
-                        Space().Size(hueBarWidth, hueBarHeight)
+                        Spacer().Size(hueBarWidth, hueBarHeight)
                         .Background(XColors.White)
                         .Alignment(XAlignment.TopCenter)
                         .Binding(hueRect, (builder, rect) =>
@@ -389,13 +407,13 @@ namespace XchyUI.Components
 
                 }).ClipContent(false);
 
-                Space(10);
+                Spacer(10);
 
                 // 透明度条
                 var alphaBarWidth = 6;
                 Box(() =>
                 {
-                    Space()
+                    Spacer()
                     .Size(FILL, 18)
                     .Margin(horizontal: alphaBarWidth / 2)
                     .Click((builder, info) =>
@@ -435,7 +453,7 @@ namespace XchyUI.Components
                         RenderImp.DrawRect(rect, style);
                     });
 
-                    Space().Size(alphaBarWidth, 22)
+                    Spacer().Size(alphaBarWidth, 22)
                         .Background(XColors.White)
                         .Alignment(XAlignment.LeftCenter)
                         .Binding(alphaRect, (builder, rect) =>
@@ -464,7 +482,7 @@ namespace XchyUI.Components
                 .Size(FILL, 18)
                 .ClipContent(false);
 
-                Space(10);
+                Spacer(10);
                 Row(() =>
                 {
                     Input()
@@ -485,7 +503,7 @@ namespace XchyUI.Components
                         builder.TextValue(color.Alpha.ToString());
                     }, true)
                     .PrimaryInput();
-                    Space(10);
+                    Spacer(10);
 
                     Input().PrimaryInput().Weight(1)
                     .KeyPress((builder, info) =>
@@ -513,14 +531,14 @@ namespace XchyUI.Components
             }).Size(WRAP).Padding(6).ClipPadding(false);
         }
 
-        public static XViewBuilder Silder(float value, XFunction<float>? onSelected = null, int trackSize = 10, int thumbSize = 28)
+        public static XViewBuilder Slider(float value, XFunction<float>? onSelected = null, int trackSize = 10, int thumbSize = 28)
         {
             return Box(() =>
             {
                 var valueState = StateValueOf(value);
                 var widthState = StateValueOf(0, true);
                 var isDragValueState = StateValueOf(false);
-                Space(trackSize).Width(FILL).Radius(trackSize / 2).Background(xTheme.Colors.BaseBorder)
+                Spacer(trackSize).Width(FILL).Radius(trackSize / 2).Background(xTheme.Colors.BaseBorder)
                 .HoverCursor(XCursorType.Hand)
                 .MeasureStart(n =>
                 {
@@ -529,7 +547,7 @@ namespace XchyUI.Components
                 })
                 .Click((builder, info) =>
                 {
-                    var left = info.X - builder.View.Parent.X - thumbSize.AsPx() / 2;
+                    var left = info.X - builder.View.Parent.X - thumbSize.AsPx()/2;
                     var trackWidth = left.AsDp();
                     var width = widthState.Value.AsDp();
                     value = (float)trackWidth / (width - thumbSize);
@@ -539,7 +557,7 @@ namespace XchyUI.Components
                     valueState.Value = value;
                     onSelected?.Invoke(valueState.Value);
                 }, defaultEffect: false);
-                Space(trackSize)
+                Spacer(trackSize)
                 .Binding(widthState, (builder, pwidth) =>
                 {
                     if (widthState.Value > 0)
@@ -563,7 +581,7 @@ namespace XchyUI.Components
                 var animateValue = AnimateFloatOf(visibleState);
                 var isMaxScale = StateValueOf(false);
 
-                Space(thumbSize)
+                Spacer(thumbSize)
                 .Background(xTheme.Colors.White)
                 .Border(xTheme.Colors.Primary, 2)
                 .Binding(widthState, (builder, pwidth) =>
@@ -625,6 +643,147 @@ namespace XchyUI.Components
             .ContentAlignment(XAlignment.LeftCenter)
             .Padding(horizontal: thumbSize / 2)
             .ClipContent(false);
+        }
+
+        public static XViewBuilder Line()
+        {
+            return Spacer(1).Width(FILL).Background(xTheme.Colors.BaseBorder).ClipContent(false);
+        }       
+
+        public static void TooltipView(XState<bool> visible, string text, XState<XRect> rectState)
+        {
+            PopupCard(visible, builder =>
+            {
+                Text(text)
+                .Alignment(XAlignment.LeftTop)
+                .MiniCard()
+                .Background(xTheme.Colors.Black)
+                .FontColor(xTheme.Colors.White)
+                .MeasureEnd(builder =>
+                {
+                    var width = builder.View.RootView().Width;
+                    var height = builder.View.RootView().Height;
+                    var rect = builder.View.RenderRect;
+                    var sourceRect = rectState.Value;
+                    var point = PopoverUtils.GetLocation(rect, sourceRect, width, height, false);
+                    builder.Margin(left:point.X.AsDp(), top:point.Y.AsDp());
+                })
+                .FadeIn();
+            },
+            disableOutClick: false,
+            outSideClick: (_, _) => visible.Value = false
+            );
+        }
+
+        public static void PopContentView(XState<bool> visible,XFunction content, XState<XRect> rectState, bool enablePopover = true, bool isAlignLeft = false, bool isSameWidth = false)
+        {
+            PopupCard(visible, builder =>
+            {
+                var visisbleState = StateValueOf(true);
+                var isOut = StateValueOf(false);
+                var animateValue = AnimateFloatOf(visisbleState);
+                var point = StateValueOf(new XPoint(), true);
+                PopoverCard(content, rectState, enablePopover, isAlignLeft, isSameWidth)
+                .LayoutEnd(builder =>
+                {
+                    var padding = 16.AsPx();
+                    var rect = builder.View.ContentRect;
+                    var sourceRect = rectState.Value;
+                    var width = builder.View.RootView().Width;
+                    var height = builder.View.RootView().Height;
+                    var direction = GetArrowDirection(rect, sourceRect, width, height, isAlignLeft, 10);
+                    if (direction == ArrowDirection.Top) point.Value = rect.TopCenter;
+                    if (direction == ArrowDirection.Bottom) point.Value = rect.BottomCenter;
+                    if (direction == ArrowDirection.Right) point.Value = rect.RightCenter;
+                    if (direction == ArrowDirection.Left) point.Value = rect.LeftCenter;
+                })
+                .Binding(animateValue, (builder, value) =>
+                {
+                    builder.Alpha(value).Scale(value, point.Value);
+                });
+            },
+            disableOutClick: false,
+            outSideClick: (_, info) =>
+            {
+                if (!rectState.Value.Contain(info.Point))
+                {
+                    visible.Value = false;
+                }
+            });
+        }
+
+        public static XViewBuilder Radio(bool isSelect, string text)
+        {
+            return Row(() =>
+            {
+                var visibleState = StateValueOf(true, true);
+                var animiateValue = AnimateFloatOf(visibleState);
+                var selectState = StateValueOf(isSelect, true);
+                Box(() =>
+                {
+                    Spacer(20).Circle().DefaultBorder().Also(builder=>
+                    {
+                        if (isSelect)
+                        {
+                            builder.Border(XColor.Empty).Background(xTheme.Colors.Primary);
+                        }
+                    });
+                    if (isSelect)
+                    {
+                        Spacer(6).Circle().Background(xTheme.Colors.Background);
+                    }
+                })
+                .Size(WRAP)
+                .Binding(animiateValue,(builder, value)=>
+                {
+                    if (selectState.Value)
+                    {
+                        builder.Scale(value).Alpha(value);
+                    }
+                });
+                Text(text);
+            }).Space(10).Hand(hoverColor: xTheme.Colors.PrimaryText);
+        }
+
+        public static XViewBuilder Checkbox(bool isSelect, string text, XFunction<bool>? onChecked = null)
+        {
+            return Box(() =>
+            {
+                var selectState = StateValueOf(isSelect, true);
+                Row(selectState, select =>
+                {
+                    var visibleState = StateValueOf(true, true);
+                    var animiateValue = AnimateFloatOf(visibleState);
+                    Box(() =>
+                    {
+                        Spacer(20).Radius(xTheme.Radius.Low).DefaultBorder();
+                        Icon(SvgRes.Check)
+                        .Color(xTheme.Colors.White)
+                        .Background(xTheme.Colors.Primary)
+                        .Size(20).Padding(2).Radius(xTheme.Radius.Low)
+                        .Binding(animiateValue,(builder,value)=>
+                        {
+                            if (selectState.Value)
+                            {
+                                builder.Scale(value).Alpha(value);
+                            }
+                            else
+                            {
+                                builder.Scale(1-value).Alpha(1-value);
+                            }
+                        });
+                    })
+                    .Size(WRAP);
+                    Text(text);
+                })
+                .Space(10)
+                .Hand(hoverColor: xTheme.Colors.PrimaryText)
+                .Click(()=>
+                {
+                    selectState.Value = !selectState.Value;
+                    onChecked?.Invoke(selectState.Value);
+                }, false);
+            }).Size(WRAP);
         }
     }
 }

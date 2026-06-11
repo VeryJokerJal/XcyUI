@@ -133,7 +133,7 @@ namespace XcyUI.widgets.extensions
             {
                 RenderImp.SetCursor(isHover ? cursorType : XCursorType.Arrow);
             }, eventKey, key)
-            .OnDispose(builder => RenderImp.SetCursor(XCursorType.Arrow), eventKey);
+            .OnDispose(b => RenderImp.SetCursor(XCursorType.Arrow), eventKey);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Silk.NET.GLFW;
+using System;
 using System.Runtime.InteropServices;
 
 namespace XcyUI.GLFW.windowStyle

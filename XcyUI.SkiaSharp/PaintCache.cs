@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using System;
 using XcyUI.models;
 using XcyUI.theme;
 using XcyUI.utils;
@@ -7,9 +8,9 @@ namespace XcyUI.SkiaSharp
 {
     public class PaintCache
     {
-        private readonly static LinkedHashMap<int, SKPaint> Cache = new();
-        private readonly static LinkedHashMap<int, SKImageFilter> ImageFilter = new();
-        private readonly static LinkedHashMap<int, SKPathEffect?> pathEffect = new();       
+        private readonly static LinkedHashMap<int, SKPaint> Cache = new LinkedHashMap<int, SKPaint>();
+        private readonly static LinkedHashMap<int, SKImageFilter> ImageFilter = new LinkedHashMap<int, SKImageFilter>();
+        private readonly static LinkedHashMap<int, SKPathEffect> pathEffect = new LinkedHashMap<int, SKPathEffect>();       
 
         public static SKPaint GetBackground(XBrush background)
         {
@@ -84,7 +85,7 @@ namespace XcyUI.SkiaSharp
             var bitmap = GetBitmapForShdow(shadow, rect, path);
             canvas.DrawBitmap(bitmap, tempRect.ToSKRect());
         }
-        internal static SKBitmap? GetBitmapForShdow(XShadow shadow, XRect rect, SKPath path)
+        internal static SKBitmap GetBitmapForShdow(XShadow shadow, XRect rect, SKPath path)
         {
             var key = $"{shadow.ShadowHashCode()}_{rect.Width}_{rect.Height}";
             if (!XThemeManager.Images.ContainsKey(key))
@@ -105,9 +106,9 @@ namespace XcyUI.SkiaSharp
             return XThemeManager.Images[key] as SKBitmap;
         }
 
-        public static SKPathEffect? GetPathEffect(XDashType type)
+        public static SKPathEffect GetPathEffect(XDashType type)
         {
-            var key = HashCode.Combine(type);
+            var key = type.GetHashCode();
             if (!pathEffect.ContainsKey(key))
             {
                 var effect = type.ToPathEffect();

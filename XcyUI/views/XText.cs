@@ -77,7 +77,7 @@ namespace XcyUI.views
 
         private int GetTextMeasrueHashCode()
         {
-            return HashCode.Combine(Font.GetHashCode(), Text, Lines, MaxLines, TextAlignment, Suffix);
+            return (Font.GetHashCode(), Text, Lines, MaxLines, TextAlignment, Suffix).GetHashCode();
         }
 
         public override void Measure()

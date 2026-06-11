@@ -1,6 +1,10 @@
 ﻿using Silk.NET.GLFW;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using XcyUI.animation;
 using XcyUI.theme;
 using XcyUI.utils;
@@ -20,14 +24,15 @@ namespace XcyUI.GLFW.window
         {
             return _windowManager;
         }
-        public XWindow? MainWindow { get; private set; }
+        public XWindow MainWindow { get; private set; }
         public Dictionary<string,XWindow> SubWindows { get; private set; }
         public bool IsSwapInterval { get; set; }
         public bool HideTitleBar { get; set; }
         protected Glfw glfw;
         private bool isRunning;
         private readonly static int _mainThreadId = Thread.CurrentThread.ManagedThreadId;
-        private double targetFrameTime = 1.0 / 60;
+        internal double TargetFrameTime { get; set; }
+        private double currentFlushTime = 0;
         private static readonly BlockingCollection<XFunction> _queue = new BlockingCollection<XFunction>(100);
         private WindowManager()
         {
@@ -35,6 +40,7 @@ namespace XcyUI.GLFW.window
             IsSwapInterval = true;
             isRunning = true;
             glfw = Glfw.GetApi();
+            TargetFrameTime = 1.0 / 60;
         }
         public unsafe void Init()
         {
@@ -57,7 +63,7 @@ namespace XcyUI.GLFW.window
             return this;
         }
 
-        public XWindow? FocusWindow()
+        public XWindow FocusWindow()
         {
             if (MainWindow != null && MainWindow.HasFoucs()) return MainWindow;
             for (int i = 0; i < SubWindows.Count; i++)
@@ -133,24 +139,20 @@ namespace XcyUI.GLFW.window
                         RemoveWindow(item.Key);
                     }
                 }
-                if (_queue.Count > 0)
+                if (_queue.TryTake(out var action))
                 {
-                    double currentTime = glfw.GetTime();
-                    _queue.TryTake(out var action);
                     action?.Invoke();
-                    var flushTime = glfw.GetTime() - currentTime;
-                    var waitTime = Math.Max(0.0001, targetFrameTime - flushTime);
-                    glfw.WaitEventsTimeout(waitTime);
                 }
                 else
                 {
                     if (EnableAutoDraw && XAnimation.IsStart())
                     {
                         double currentTime = glfw.GetTime();
-                        Render();
-                        var flushTime = glfw.GetTime() - currentTime;
-                        var waitTime = Math.Max(0.0001, targetFrameTime - flushTime);
-                        glfw.WaitEventsTimeout(waitTime);
+                        if(currentTime - currentFlushTime >= TargetFrameTime)
+                        {
+                            Render();
+                            currentFlushTime = currentTime;
+                        }
                     }
                     else
                     {

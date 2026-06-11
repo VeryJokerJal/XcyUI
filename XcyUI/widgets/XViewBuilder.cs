@@ -14,7 +14,7 @@ namespace XcyUI.widgets
 {
     public class XViewBuilder
     {
-        internal static Dictionary<string, XFunction> bindKeys = new();
+        internal static Dictionary<string, XFunction> bindKeys = new Dictionary<string, XFunction>();
         public XView View { get; private set; }
 
         public static XViewBuilder With(XView view)
@@ -365,12 +365,18 @@ namespace XcyUI.widgets
             {
                 XFunction<T> observer = (t) =>
                 {
+                    var margin = View.LayoutParams.Margin;
                     function.Invoke(this, t);
                     XView layoutView = View;
                     if (needLayout)
                     {
-                        View.BubbleUpLayout();
-                        View.Invalidate();
+                        var view = View;
+                        if (!view.LayoutParams.Equals(margin))
+                        {
+                            view = view.Parent == null ? view : view.Parent;
+                        }
+                        view.BubbleUpLayout();
+                        view.Invalidate();
                     }
                     else if (!XAnimation.IsStart())
                     {

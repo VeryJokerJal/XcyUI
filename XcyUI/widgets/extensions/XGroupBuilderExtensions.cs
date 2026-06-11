@@ -48,7 +48,7 @@ namespace XcyUI.widgets.extensions
 
         public static XViewBuilder ToggleHover(this XViewBuilder builder, XFunction<bool> function, string eventKey = "ToggleHover", [CallerLineNumber] int key = 0)
         {
-            return ToggleHover(builder, (builder, isHover) => function.Invoke(isHover), eventKey, key);
+            return ToggleHover(builder, (b, isHover) => function.Invoke(isHover), eventKey, key);
         }
         public static XViewBuilder ToggleHover(this XViewBuilder builder, XFunction<XViewBuilder, bool> function, string eventKey = "ToggleHover", [CallerLineNumber] int key = 0)
         {

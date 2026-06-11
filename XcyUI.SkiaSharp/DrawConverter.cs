@@ -1,4 +1,6 @@
 ﻿using SkiaSharp;
+using System;
+using System.Collections.Generic;
 using XcyUI.models;
 
 namespace XcyUI.SkiaSharp
@@ -245,7 +247,7 @@ namespace XcyUI.SkiaSharp
             {
                 font.Name = "宋体";
             }
-            var key = HashCode.Combine(font.Name, font.Weight, font.Italic);
+            var key = (font.Name, font.Weight, font.Italic).GetHashCode();
             if (!Typefaces.ContainsKey(key))
             {
                 if (string.IsNullOrEmpty(font.Path))
@@ -266,15 +268,23 @@ namespace XcyUI.SkiaSharp
             return Typefaces[key];
         }
 
-        public static SKPathEffect? ToPathEffect(this XDashType type)
+        public static SKPathEffect ToPathEffect(this XDashType type)
         {
-            SKPathEffect? pathEffect = type switch
+            SKPathEffect pathEffect = null;
+            switch (type)
             {
-                XDashType.Dash => SKPathEffect.CreateDash([12f, 6f], 0),
-                XDashType.Dot => SKPathEffect.CreateDash([2f, 8f], 0),
-                XDashType.DashDot => SKPathEffect.CreateDash([20f, 5f, 8f, 5f], 0),
-                _ => null
-            };
+                case XDashType.Dash:
+                    pathEffect = SKPathEffect.CreateDash(new float[2] { 12f, 6f }, 0);
+                    break;
+                case XDashType.Dot:
+                    pathEffect = SKPathEffect.CreateDash(new
+                        float[2] { 2f, 8f }, 0);
+                    break;
+                case XDashType.DashDot:
+                    pathEffect = SKPathEffect.CreateDash(new
+                        float[4] { 20f, 5f, 8f, 5f }, 0);
+                    break;
+            }
 
             return pathEffect;
         }

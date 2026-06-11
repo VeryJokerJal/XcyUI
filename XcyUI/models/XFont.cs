@@ -28,7 +28,7 @@ namespace XcyUI.models
 
         public int FontHasCode()
         {
-            return HashCode.Combine(Path, Name, Color, Size, Weight, Italic, Underline, DeleteLine);
+            return (Path, Name, Color, Size, Weight, Italic, Underline, DeleteLine).GetHashCode();
         }
        
 

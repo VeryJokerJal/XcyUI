@@ -58,7 +58,7 @@ namespace XcyUI.animation
         /// </summary>
         public static XFunctionResult<float> AccelerateDecelerate = (input) =>
         {
-            return (float)(1 - Math.Cos(input * Math.PI)) / 2f; ;
+            return (float)(1 - Math.Cos(input * Math.PI)) / 2f;
         };
 
         /// <summary>

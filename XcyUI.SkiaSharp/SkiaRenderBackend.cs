@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using System;
 using System.Diagnostics;
 using XcyUI.animation;
 using XcyUI.events;
@@ -12,8 +13,8 @@ namespace XcyUI.SkiaSharp
 {
     public class SkiaRenderBackend : IRenderBackend
     {
-        private SKSurface? surface;
-        private GRContext? grContext;
+        private SKSurface surface;
+        private GRContext grContext;
         public SkiaDraw SkiaDraw { get; private set; }
         public XNavigationPage Navigation { get; private set; }
         public SKColor BackgoundColor { get; set; }
@@ -38,7 +39,7 @@ namespace XcyUI.SkiaSharp
         }
         public void ResetSurface(int width, int height, object paramsData)
         {
-            //grContext?.Flush();
+            grContext?.Flush();
             grContext?.PurgeUnusedResources(100);
             //grContext?.ResetContext();
             surface?.Dispose();
@@ -99,6 +100,7 @@ namespace XcyUI.SkiaSharp
             SkiaDraw.Canvas.Clear(BackgoundColor);
             Navigation?.Draw();
             SkiaDraw.Canvas.Flush();
+            grContext.PurgeUnusedResources(1000);
         }
 
         public void DispatchEvent(XView view, XEventInfo info)

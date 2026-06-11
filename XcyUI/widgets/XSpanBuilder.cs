@@ -123,17 +123,17 @@ namespace XcyUI.widgets
         {
             var builder = new XViewBuilder(textView);
             builder
-            .OnHover((builder, info) =>
+            .OnHover((b, info) =>
             {
                 var spanChars = textView.GetChars(span.StartIndex, span.EndIndex);
                 var isIn = spanChars.Count(n => n.RenderRect.Contain(info.Point)) > 0;
                 RenderImp.SetCursor(isIn ? XCursorType.Hand : XCursorType.Arrow);
             })
-            .OnLeave((builder, info) =>
+            .OnLeave((b, info) =>
             {
                 RenderImp.SetCursor(XCursorType.Arrow);
             });
-            textView.EventParams.EventOrCreate(XEventType.Click).AddFunction($"span_{span.StartIndex}_{span.EndIndex}", (builder, info) =>
+            textView.EventParams.EventOrCreate(XEventType.Click).AddFunction($"span_{span.StartIndex}_{span.EndIndex}", (b, info) =>
             {
                 var spanChars = textView.GetChars(span.StartIndex, span.EndIndex);
                 var isIn = spanChars.Count(n => n.RenderRect.Contain(info.Point)) > 0;

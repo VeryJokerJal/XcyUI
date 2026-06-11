@@ -24,7 +24,7 @@ namespace XcyUI.models
 
         public int StyleHashCode()
         {
-            return HashCode.Combine(Background, Border, Radius, Shadow);
+            return (Background, Border, Radius, Shadow).GetHashCode();
         }
 
         public void Reset()

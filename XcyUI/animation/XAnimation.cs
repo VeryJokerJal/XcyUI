@@ -10,7 +10,7 @@ namespace XcyUI.animation
         private static readonly Stopwatch _stopwatch = new Stopwatch();
         private static XAnimation animation = new XAnimation();
         private List<XAnimate> animates;
-        private List<XAnimate> redAnimates = new();
+        private List<XAnimate> redAnimates = new List<XAnimate>();
         private XAnimation()
         {
             animates = new List<XAnimate>();

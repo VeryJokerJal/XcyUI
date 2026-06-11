@@ -5,12 +5,23 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	  <PublishAot>true</PublishAot>
+	  <TrimMode>full</TrimMode>
+	  <DebugType>none</DebugType>
+	  <PublishTrimmed>true</PublishTrimmed>
+	  <DebugSymbols>false</DebugSymbols>
+	  <Optimize>true</Optimize>
+	  <InvariantGlobalization>true</InvariantGlobalization>
+	  <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+	  <PublishNativeAssetsForSelfExtract>true</PublishNativeAssetsForSelfExtract>
+	  <RuntimeIdentifiers>win-x64;linux-x64;linux-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\XcyUI.GLFW\XcyUI.GLFW.csproj" />
     <ProjectReference Include="..\XcyUI.SkiaSharp\XcyUI.SkiaSharp.csproj" />
     <ProjectReference Include="..\XcyUI\XcyUI.csproj" />
+	<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.1" />
   </ItemGroup>
 
 </Project>

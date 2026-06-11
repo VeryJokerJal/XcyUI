@@ -101,6 +101,7 @@ namespace XcyUI.views
         {
             base.OnMeasure();
             EventParams.Event(XEventType.MeasureStart)?.Invoke(this, null);
+            this.MeasureSize();
             if (Childs.Count == 0) return;
 
             if (LayoutParams.IsWrapWidth)

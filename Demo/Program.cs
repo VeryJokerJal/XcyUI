@@ -1,10 +1,11 @@
 ﻿using Demo.Theme;
 using XchyUIDemo;
+using XcyUI.animation;
 using XcyUI.models;
 using XcyUI.SkiaSharp;
+using XcyUI.widgets.extensions;
 using static XcyUI.GLFW.window.XWindowWidget;
 using static XcyUI.widgets.XWidget;
-using XcyUI.widgets.extensions;
 
 MainWindow(() =>
 {

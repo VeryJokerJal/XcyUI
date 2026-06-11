@@ -1,8 +1,9 @@
 ﻿using SkiaSharp;
 using Svg.Skia;
-using System.Reflection;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.JavaScript;
 using XcyUI.models;
 using XcyUI.theme;
 using XcyUI.views;
@@ -12,19 +13,19 @@ namespace XcyUI.SkiaSharp
 {
     public class SkiaDraw : IDraw
     {
-        public SKCanvas? Canvas { get; set; }
-        public SKSurface? Surface { get; set; }
+        public SKCanvas Canvas { get; set; }
+        public SKSurface Surface { get; set; }
         
-        private SKPaint animationPain = new();
+        private SKPaint animationPain = new SKPaint();
         private SKFont skFont;
-        private SKPath skPath = new();
-        private SKPath? mPath = new();
-        private SKPaint pictruePaint = new();
-        private SKPaint bitmapPaint = new();
-        private SKPaint? debugPaint = null;
+        private SKPath skPath = new SKPath();
+        private SKPath mPath = new SKPath();
+        private SKPaint pictruePaint = new SKPaint();
+        private SKPaint bitmapPaint = new SKPaint();
+        private SKPaint debugPaint = null;
         private bool isRefreshCache = false;
-        private SKTextBlobBuilder blobBuilder = new();
-        private SKSvg svg = new();
+        private SKTextBlobBuilder blobBuilder = new SKTextBlobBuilder();
+        private SKSvg svg = new SKSvg();
         public SkiaDraw()
         {
             animationPain.IsAntialias = true;
@@ -68,7 +69,7 @@ namespace XcyUI.SkiaSharp
             }
             if (cache.CacheData == null || cache.IsRefreshCache || isRefreshCache)
             {
-                SKBitmap? cacheBitmap = null;
+                SKBitmap cacheBitmap = null;
                 if(cache.CacheData is SKBitmap)
                 {
                     cacheBitmap = (SKBitmap)cache.CacheData;
@@ -114,7 +115,7 @@ namespace XcyUI.SkiaSharp
             var tempRect = rect;
             if (isRefreshCache || cache.CacheData == null || cache.IsRefreshCache)
             {
-                SKPicture? picture = null;
+                SKPicture picture = null;
                 if (cache.CacheData is SKPicture)
                 {
                     picture = (SKPicture)cache.CacheData;
@@ -222,7 +223,7 @@ namespace XcyUI.SkiaSharp
             }
         }
 
-        public void DrawBaseRect(XRect rect, XStyle style, XDrawCache? cache, XFunction onDraw)
+        public void DrawBaseRect(XRect rect, XStyle style, XDrawCache cache, XFunction onDraw)
         {
             if (Canvas == null) return;
             var cRect = rect.ToSKRect();
@@ -520,7 +521,7 @@ namespace XcyUI.SkiaSharp
                 Canvas?.DrawPicture(picture, in matrix, paint);
             }
         }
-        public object? GetSvg(string svgContent)
+        public object GetSvg(string svgContent)
         {
             var svgFile = svg.FromSvg(svg: svgContent);
             return svgFile;
@@ -596,11 +597,18 @@ namespace XcyUI.SkiaSharp
                         paint.Color = style.Background.StartColor.ToSKColor();
                         if (!style.Background.EndColor.IsEmpty)
                         {
-                            paint.Shader = DrawConverter.ToShader(rect, style.Background);
+                            using (var shader = DrawConverter.ToShader(rect, style.Background))
+                            {
+                                paint.Shader = shader;
+                            }
+                            
                         }
                         if (!style.Shadow.IsEmpty && !isCache)
                         {
-                            paint.ImageFilter = PaintCache.GetImageFilter(style.Shadow);
+                            using (var filter = PaintCache.GetImageFilter(style.Shadow))
+                            {
+                                paint.ImageFilter = filter;
+                            }
                         }
                         Canvas.DrawPath(mPath, paint);
                     }

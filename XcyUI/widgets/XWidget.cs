@@ -27,8 +27,8 @@ namespace XcyUI.widgets
         public static int FILL = XLayoutParams.Fill;
         public static int WRAP = XLayoutParams.Wrap;
         public static int NONE = XLayoutParams.None;
-        private static Dictionary<string, object> stateValues = new();
-        private static Dictionary<int, XView> floatingCards = new();
+        private static Dictionary<string, object> stateValues = new Dictionary<string, object>();
+        private static Dictionary<int, XView> floatingCards = new Dictionary<int, XView>();
         public static XState<bool> HotReload { get; private set; }
         public static bool EnableHotReload = Debugger.IsAttached;
         internal static bool isHotReload = false;
@@ -508,7 +508,7 @@ namespace XcyUI.widgets
                 }
             }
 
-            if (!stateValues.ContainsKey(keyString) || stateValues[keyString] is not XState<T>)
+            if (!stateValues.ContainsKey(keyString) || !(stateValues[keyString] is XState<T>))
             {
                 var newState = new XState<T>(value);
                 stateValues.Add(keyString, newState);

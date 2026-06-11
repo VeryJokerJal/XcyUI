@@ -5,7 +5,7 @@ namespace XcyUI.GLFW.curor
 {
     public abstract class BaseCursor : ICuror
     {
-        public Glfw? Glfw { get; set; }
+        public Glfw Glfw { get; set; }
         public unsafe WindowHandle* Window { get; set; }
 
         public abstract void ChangedImmPosition(XPoint point);

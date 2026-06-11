@@ -9,7 +9,7 @@ namespace XcyUI.widgets
 {
     public static class XDIWidget
     {
-        private static Dictionary<string, object> services = new();
+        private static Dictionary<string, object> services = new Dictionary<string, object>();
         public static T Service<T>() where T : new()
         {
             var window = RenderImp.GetWindow();

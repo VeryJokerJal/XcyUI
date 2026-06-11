@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 using XcyUI.expansions;
 using XcyUI.models;
 
@@ -204,7 +206,8 @@ namespace XcyUI.GLFW.windowStyle
         public void DisableTitlebar(IntPtr glfwWindowPtr)
         {
             IntPtr hWnd = glfwWindowPtr;
-            uint currentStyle = (uint)GetWindowLongPtr(hWnd, GWL_STYLE);
+            IntPtr stylePtr = GetWindowLongPtr(hWnd, GWL_STYLE);
+            uint currentStyle = unchecked((uint)stylePtr.ToInt64());
             currentStyle &= ~(WS_CAPTION);
             currentStyle |= (WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_OVERLAPPED);
             SetWindowLongPtr(hWnd, GWL_STYLE, new IntPtr(currentStyle));
@@ -249,13 +252,7 @@ namespace XcyUI.GLFW.windowStyle
             if (handle == IntPtr.Zero) return;
 
             // 转换为 API 需要的参数
-            int value = mode switch
-            {
-                WindowColorMode.Dark => 1,
-                WindowColorMode.Light => 0,
-                _ => 0 // Auto 默认浅色
-            };
-
+            int value = mode == WindowColorMode.Dark ? 1 : 0;
             // 调用 Win32 API
             DwmSetWindowAttribute(handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, sizeof(int));
         }

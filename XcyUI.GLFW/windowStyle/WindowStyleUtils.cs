@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace XcyUI.GLFW.windowStyle
 {
@@ -9,26 +10,26 @@ namespace XcyUI.GLFW.windowStyle
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
         private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
         [DllImport("user32.dll")]
-        private static extern int SetWindowLong(nint hWnd, int nIndex, int dwNewLong);
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern int GetWindowLong(nint hWnd, int nIndex);
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
-        private static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter,
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
             int X, int Y, int cx, int cy, uint uFlags);
 
         [DllImport("dwmapi.dll")]
-        private static extern int DwmSetWindowAttribute(nint hwnd, int attr, ref int attrValue, int attrSize);
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
         [DllImport("dwmapi.dll")]
-        private static extern int DwmExtendFrameIntoClientArea(nint hWnd, ref MARGINS pMarInset);
+        private static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
 
         [DllImport("user32.dll")]
         private static extern bool ReleaseCapture();
 
         [DllImport("user32.dll")]
-        private static extern nint SendMessage(nint hWnd, int msg, nint wParam, nint lParam);
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll")]
         private static extern bool PostMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
@@ -178,7 +179,7 @@ namespace XcyUI.GLFW.windowStyle
 
         }
 
-        private static void SetupDwmFrame(nint hwnd)
+        private static void SetupDwmFrame(IntPtr hwnd)
         {
             // 启用DWM边框扩展
             var margins = new MARGINS
@@ -193,13 +194,13 @@ namespace XcyUI.GLFW.windowStyle
             DwmExtendFrameIntoClientArea(hwnd, ref margins);
         }
 
-        public static void MoveWindow(nint hwnd)
+        public static void MoveWindow(IntPtr hwnd)
         {
             ReleaseCapture();
             PostMessage(hwnd, WM_NCLBUTTONDOWN, (IntPtr)HT_CAPTION, IntPtr.Zero);            
         }
 
-        public static void EndMoveWindow(nint hwnd)
+        public static void EndMoveWindow(IntPtr hwnd)
         {
             ReleaseCapture();
             PostMessage(hwnd, 0x0000, IntPtr.Zero, IntPtr.Zero);

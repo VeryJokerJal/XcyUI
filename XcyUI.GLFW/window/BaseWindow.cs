@@ -1,5 +1,4 @@
 ﻿using Silk.NET.GLFW;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using XcyUI.GLFW.windowStyle;
 using XcyUI.models;
@@ -27,12 +26,12 @@ namespace XcyUI.GLFW.window
         protected Glfw glfw => WindowManager.Get().GetGlfw();
         protected bool isFocused;
         protected bool isDispose = false;
-        public IRenderBackend? RenderBackend { get; set; }
-        internal XFunction? LoadAction { get; set; }
-        internal XFunction? RunAction { get; set; }
+        public IRenderBackend RenderBackend { get; set; }
+        internal XFunction LoadAction { get; set; }
+        internal XFunction RunAction { get; set; }
         
-        internal XFunction? LoadIcon { get; set; }
-        internal List<XFunction> closeFunctions = new();
+        internal XFunction LoadIcon { get; set; }
+        internal List<XFunction> closeFunctions = new List<XFunction>();
         public BaseWindow()
         {
             Width = 900;
@@ -61,7 +60,7 @@ namespace XcyUI.GLFW.window
 
             // 创建画布
             RenderImp.SetWindow(this);
-            RenderBackend?.CreateSurface(fbWidth, fbHeight, glfw.GetProcAddress);
+            RenderBackend?.CreateSurface(fbWidth, fbHeight, (Func<string, IntPtr>)glfw.GetProcAddress);
             OnLoad();
             RunAction?.Invoke();
             Render();
@@ -374,7 +373,7 @@ namespace XcyUI.GLFW.window
         public unsafe void SetWindowIcon(XBitmap bitmap)
         {
             byte* ptr = (byte*)Marshal.AllocHGlobal(bitmap.Buffers.Length);
-            Marshal.Copy(bitmap.Buffers, 0, (nint)ptr, bitmap.Buffers.Length);
+            Marshal.Copy(bitmap.Buffers, 0, (IntPtr)ptr, bitmap.Buffers.Length);
             try
             {
                 Image img = new Image
@@ -387,7 +386,7 @@ namespace XcyUI.GLFW.window
             }
             finally
             {
-                Marshal.FreeHGlobal((nint)ptr);
+                Marshal.FreeHGlobal((IntPtr)ptr);
             }
         }
 

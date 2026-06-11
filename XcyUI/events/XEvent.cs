@@ -15,7 +15,7 @@ namespace XcyUI.events
         public static XView TargetView { get; private set; }
         // 鼠标悬浮的view
         public static XView HoverView { get; private set; }
-        internal static List<XView> PreHoverViews = new();
+        internal static List<XView> PreHoverViews = new List<XView>();
         //获取焦点的view
         public static XView FocusView { get; private set; }
 

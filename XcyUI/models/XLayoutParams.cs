@@ -50,9 +50,9 @@ namespace XcyUI.models
 
         public int MeasureHashCode()
         {
-            var leftCode = HashCode.Combine(Width, Height, Weight, MaxWidth, MaxHeight, MinWidth, MinHeight);
-            var rightCode = HashCode.Combine(Padding, Margin, Alignment, Visible, Freeze, Colspan, AspectRatio);
-            return HashCode.Combine(leftCode, rightCode);
+            var leftCode = (Width, Height, Weight, MaxWidth, MaxHeight, MinWidth, MinHeight).GetHashCode();
+            var rightCode = (Padding, Margin, Alignment, Visible, Freeze, Colspan, AspectRatio).GetHashCode();
+            return (leftCode, rightCode).GetHashCode();
         }
 
         internal void Reset()

@@ -100,10 +100,11 @@ namespace XcyUI.models
             Dy = y;
             Color = color;
             Blur = blur;
+            Inset = false;
         }
         public int ShadowHashCode()
         {
-            return HashCode.Combine(Dx, Dy, Color, Blur, Inset);
+            return (Dx, Dy, Color, Blur, Inset).GetHashCode();
         }
     }
     public enum XDashType

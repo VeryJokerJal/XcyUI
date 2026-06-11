@@ -82,7 +82,7 @@ namespace XcyUI.views
             AnimateItems = null;
             if (IsAnimate && Items.Count > 0)
             {
-                AnimateItems = [.. Items];
+                AnimateItems = Items.ToList();
             }
             childRect = new XRect();
             if (IsFixedItem)

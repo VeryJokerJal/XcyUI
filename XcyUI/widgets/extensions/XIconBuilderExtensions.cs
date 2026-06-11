@@ -39,8 +39,8 @@ namespace XcyUI.widgets.extensions
 
         public static XViewBuilder Color(this XViewBuilder setter, XColor color)
         {
-            setter.AsView<XIcon>()?.Also(n => n.Color = new(color));
-            setter.AsView<XText>()?.Also(n => n.Font.Color = new(color));
+            setter.AsView<XIcon>()?.Also(n => n.Color = new XBrush(color));
+            setter.AsView<XText>()?.Also(n => n.Font.Color = new XBrush(color));
             return setter;
         }
         public static XViewBuilder Color(this XViewBuilder setter, XBrush color)

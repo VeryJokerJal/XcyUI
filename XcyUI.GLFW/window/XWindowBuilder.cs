@@ -1,6 +1,7 @@
 ﻿using XcyUI.models;
 using XcyUI.navigation;
 using XcyUI.utils;
+using XcyUI.widgets;
 using static XcyUI.models.XFunctions;
 using static XcyUI.widgets.XWidget;
 
@@ -46,7 +47,6 @@ namespace XcyUI.GLFW.window
         {
             WindowManager.Get().FocusWindow()?.MoveWindow();
         }
-
     }
     public class XWindowBuilder
     {
@@ -98,6 +98,12 @@ namespace XcyUI.GLFW.window
         public XWindowBuilder RenderBackend(IRenderBackend renderBackend)
         {
             Window.RenderBackend = renderBackend;
+            return this;
+        }
+
+        public XWindowBuilder FrameRate(double rate)
+        {
+            WindowManager.Get().TargetFrameTime = rate;
             return this;
         }
 

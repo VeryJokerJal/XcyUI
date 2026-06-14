@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -443,6 +442,10 @@ namespace XcyUI.widgets
                     }
                 };
                 visibleState.Add(observer);
+                if (visibleState.Value)
+                {
+                    observer.Invoke(true);
+                }
                 widget.currentView.AddEvent(XEventType.Dispose, "floating_dispose" + floatingKey, () =>
                 {
                     visibleState.Remove(observer);
@@ -483,7 +486,7 @@ namespace XcyUI.widgets
         
         public static XState<T> StateValueOf<T>(T value = default,bool isReset = false, XFunction<XState<T>> onCreate = null, [CallerLineNumber] int key = 0, string keyPrefix = null)
         {
-            var lastPrefix = $"{widget.currentView.Parent.GetHashCode()}_{typeof(T)}_state_{key}";
+            var lastPrefix = $"{(widget.currentView.Parent??widget.currentParent)?.GetHashCode()}_{typeof(T)}_state_{key}";
             var keyString = $"{widget.currentView.GetHashCode()}_{lastPrefix}";
             if (keyPrefix != null)
             {

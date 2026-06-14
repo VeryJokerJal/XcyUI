@@ -1,4 +1,7 @@
 ﻿using Silk.NET.GLFW;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using XcyUI.GLFW.windowStyle;
 using XcyUI.models;
@@ -173,6 +176,10 @@ namespace XcyUI.GLFW.window
                 this.isFocused = focus;
                 RenderBackend?.Focus(focus);
                 Render();
+                if (focus)
+                {
+                    WindowManager.Get().TopWindow = (XWindow)this;
+                }
             });
         }
 
@@ -304,11 +311,12 @@ namespace XcyUI.GLFW.window
             RenderImp.SetWindow(this);
             RenderBackend?.DispatchEvent(eventInfo);
         }
-
+        Stopwatch stopwatch = new Stopwatch();
         public unsafe void Render()
         {
             if (!IsClosed())
             {
+                stopwatch.Restart();
                 if (glfw.GetCurrentContext() != window)
                 {
                     glfw.MakeContextCurrent(window);
@@ -316,6 +324,8 @@ namespace XcyUI.GLFW.window
                 RenderImp.SetWindow(this);
                 RenderBackend?.Render();
                 SwapBuffer();
+                stopwatch.Stop();
+                Console.WriteLine("times:" + stopwatch.ElapsedMilliseconds);
             }
         }
 

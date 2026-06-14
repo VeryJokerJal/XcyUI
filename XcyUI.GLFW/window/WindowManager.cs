@@ -24,6 +24,7 @@ namespace XcyUI.GLFW.window
         {
             return _windowManager;
         }
+        internal BaseWindow TopWindow { get; set; }
         public XWindow MainWindow { get; private set; }
         public Dictionary<string,XWindow> SubWindows { get; private set; }
         public bool IsSwapInterval { get; set; }
@@ -167,7 +168,7 @@ namespace XcyUI.GLFW.window
         private void Render(bool renderAll = false)
         {
             stopwatch.Restart();
-            if(MainWindow?.HasFoucs() == true || renderAll)
+            if(MainWindow?.HasFoucs() == true || MainWindow == TopWindow || renderAll)
             {
                 if (renderAll)
                 {
@@ -181,7 +182,7 @@ namespace XcyUI.GLFW.window
             }
             foreach (var item in SubWindows)
             {
-                if (item.Value.HasFoucs() || renderAll)
+                if (item.Value.HasFoucs() || item.Value == TopWindow || renderAll)
                 {
                     if (renderAll)
                     {
@@ -205,7 +206,6 @@ namespace XcyUI.GLFW.window
         {
             return glfw;
         }
-
         public void Invalidate(bool refreshAll)
         {
             ExecuteOnMainThread(() =>

@@ -1,4 +1,5 @@
-﻿using XcyUI.models;
+﻿using System.Diagnostics;
+using XcyUI.models;
 using XcyUI.navigation;
 using XcyUI.utils;
 using XcyUI.widgets;
@@ -20,6 +21,10 @@ namespace XcyUI.GLFW.window
                     RootView = ContentView(() =>
                     {
                         fun.Invoke();
+                        if (Debugger.IsAttached)
+                        {
+                            Spacer();
+                        }
                     }).View
                 };
                 window.OpenPage(page);

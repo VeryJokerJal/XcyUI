@@ -16,6 +16,7 @@ namespace XcyUI.views
         public XAlignment TextAlignment { get; set; }
         protected string _text;
         protected bool isChangedText;
+        public bool IsContentOver { get; internal set; }
         public string Text
         {
             get => _text;
@@ -135,6 +136,7 @@ namespace XcyUI.views
             var contentRect = ContentRect;
             charItems.Clear();
             rows.Clear();
+            IsContentOver = false;
             if (!string.IsNullOrEmpty(text))
             {
                 var left = 0;
@@ -199,6 +201,7 @@ namespace XcyUI.views
                             row = rows.Last();
                         }
                         AddSuffix();
+                        IsContentOver = true;
                         break;
                     }
 

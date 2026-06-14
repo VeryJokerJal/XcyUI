@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XcyUI.GLFW", "XcyUI.GLFW\Xc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XcyUI.SkiaSharp", "XcyUI.SkiaSharp\XcyUI.SkiaSharp.csproj", "{FC5B2F21-8FD6-EE5C-E093-DB28FAEA7251}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XcyUI.Controls", "XcyUI.Controls\XcyUI.Controls.csproj", "{0915DBAC-8D3A-41B6-FFEF-A21251B648BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{FC5B2F21-8FD6-EE5C-E093-DB28FAEA7251}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC5B2F21-8FD6-EE5C-E093-DB28FAEA7251}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC5B2F21-8FD6-EE5C-E093-DB28FAEA7251}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0915DBAC-8D3A-41B6-FFEF-A21251B648BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0915DBAC-8D3A-41B6-FFEF-A21251B648BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0915DBAC-8D3A-41B6-FFEF-A21251B648BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0915DBAC-8D3A-41B6-FFEF-A21251B648BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

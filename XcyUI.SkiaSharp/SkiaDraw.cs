@@ -563,7 +563,6 @@ namespace XcyUI.SkiaSharp
             paint.Color = style.Background.StartColor.ToSKColor();
             var size = Math.Min(rect.Width, rect.Height);
             rect = new XRect(rect.Center.X - size / 2, rect.Center.Y - size / 2, size, size);
-            rect.Scale(-(int)style.Border.Size.All);
             if (!style.Background.EndColor.IsEmpty)
             {
                 paint.Shader = DrawConverter.ToShader(rect, style.Background);

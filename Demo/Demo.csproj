@@ -18,6 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\XcyUI.Controls\XcyUI.Controls.csproj" />
     <ProjectReference Include="..\XcyUI.GLFW\XcyUI.GLFW.csproj" />
     <ProjectReference Include="..\XcyUI.SkiaSharp\XcyUI.SkiaSharp.csproj" />
     <ProjectReference Include="..\XcyUI\XcyUI.csproj" />

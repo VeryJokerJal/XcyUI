@@ -77,7 +77,7 @@ namespace XcyUI.widgets.extensions
         
         public static XViewBuilder OnFocused(this XViewBuilder builder, XFunction<XViewBuilder> function, string key = "OnFocused")
         {
-            builder.View.AddEvent(XEventType.Focused, key, (v, info) => function(builder));
+            builder.View.AddEvent(XEventType.Focused, key, (v, info) => function?.Invoke(builder));
             return builder.CanDown();
         }
 
@@ -85,7 +85,7 @@ namespace XcyUI.widgets.extensions
         {
             builder.View.AddEvent(XEventType.LossFocused, key, (v, info) =>
             {
-                function(builder);
+                function?.Invoke(builder);
             });
             return builder.CanDown();
         }
@@ -127,6 +127,10 @@ namespace XcyUI.widgets.extensions
         
         public static XViewBuilder Click(this XViewBuilder builder,XFunction function, bool defaultEffect = true, string eventKey = "default_click")
         {
+            if (function == null)
+            {
+                return builder;
+            }
             builder.View.AddEvent(XEventType.Click, eventKey, function);
             if (defaultEffect)
             {

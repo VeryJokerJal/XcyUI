@@ -4,11 +4,26 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<Version>1.0.0</Version>
- </PropertyGroup>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Silk.NET.GLFW" Version="2.22.0" />
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.94.2" />
+    <PackageReference Include="Tmds.DBus.Generator" Version="0.94.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.Bus.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Socket.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Accessible.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Application.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Component.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Action.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Text.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.EditableText.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Value.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
+    <AdditionalFiles Include="accessibility/DBusXml/org.a11y.atspi.Selection.xml" Namespace="XcyUI.GLFW.accessibility.DBus" DBusGeneratorMode="Handler" />
   </ItemGroup>
 
   <ItemGroup>
